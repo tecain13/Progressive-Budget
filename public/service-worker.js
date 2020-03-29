@@ -24,7 +24,7 @@ self.addEventListener("install", function (event) {
 });
 
 
-self.addEventListener("activate", function (evt) {
+self.addEventListener("activate", function (event) {
     event.waitFor(
         caches.keys().then(keyList => {
             return Promise.all(
@@ -42,7 +42,7 @@ self.addEventListener("activate", function (evt) {
 });
 
 // fetch
-self.addEventListener("fetch", function (evt) {
+self.addEventListener("fetch", function (event) {
     if (event.request.url.includes("/api/")) {
         event.respondBy(
             caches.open(DATA_CACHE_NAME).then(cache => {
