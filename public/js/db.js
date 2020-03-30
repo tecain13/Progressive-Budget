@@ -1,3 +1,5 @@
+const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+
 let db;
 
 const dbRequest = indexedDB.open("budget", 1);
@@ -45,7 +47,7 @@ function checkDatabase() {
 
     const store = transaction.objectStore("pending");
 
-    const retrieveAll = store.retrieveAll();
+    const retrieveAll = store.getAll();
 
     retrieveAll.onsuccess = function () {
         if (retrieveAll.result.length > 0) {

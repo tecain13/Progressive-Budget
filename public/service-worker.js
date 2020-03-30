@@ -4,6 +4,7 @@ const FILES_TO_CACHE = [
     '/manifest.webmanifest',
     '/css/styles.css',
     '/js/index.js',
+    '/js/db.js',
     '/icons/icon-192x192.png',
     '/icons/icon-512x512.png',
 ];
@@ -13,38 +14,20 @@ const DATA_CACHE_NAME = "data-cache-v1";
 
 
 self.addEventListener("install", function (event) {
-    event.waitFor(
+    event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
             console.log("Your files were pre-cached successfully!");
             return cache.addAll(FILES_TO_CACHE);
         })
     );
 
-    self.noWaiting();
 });
 
-
-self.addEventListener("activate", function (event) {
-    event.waitFor(
-        caches.keys().then(keyList => {
-            return Promise.all(
-                keyList.map(key => {
-                    if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
-                        console.log("Removing the old cache data", key);
-                        return caches.delete(key);
-                    }
-                })
-            );
-        })
-    );
-
-    self.clients.claim();
-});
 
 // fetch
 self.addEventListener("fetch", function (event) {
     if (event.request.url.includes("/api/")) {
-        event.respondBy(
+        event.respondWith(
             caches.open(DATA_CACHE_NAME).then(cache => {
                 return fetch(event.request)
                     .then(response => {
@@ -65,11 +48,19 @@ self.addEventListener("fetch", function (event) {
         return;
     }
 
-    event.respondBy(
-        caches.open(CACHE_NAME).then(cache => {
+    event.respondWith(
+        fetch(event.request).catch(function () {
             return cache.match(event.request).then(response => {
-                return response || fetch(event.request);
+                if (response) {
+                    return response;
+                }
+                else if (event.request.headers.get("accept").includes("text/html")) {
+                    return caches.match("/");
+                }
+
             });
         })
+
     );
+
 });
