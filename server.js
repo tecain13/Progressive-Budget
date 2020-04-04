@@ -5,7 +5,7 @@ const compression = require("compression");
 const PORT = 8080;
 const app = express();
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/budget"
+const MONGODB_URI = process.env.MONGOLAB_BLUE_URI || "mongodb://localhost/budget"
 const options = {
   useNewUrlParser: true,
   useFindAndModify: false,
